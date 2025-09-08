@@ -1,6 +1,27 @@
 import pandas as pd
 import re
 from openpyxl import load_workbook
+import os
+
+
+def load_config(config_path='config.txt'):
+    """从配置文件加载路径配置"""
+    config = {}
+    try:
+        with open(config_path, 'r', encoding='utf-8') as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith('#') and '=' in line:
+                    key, value = line.split('=', 1)
+                    config[key.strip()] = value.strip()
+        return config
+    except FileNotFoundError:
+        print(f"配置文件 {config_path} 未找到，使用默认配置")
+        return {
+            'source_path': r'D:\sort\数据清洗需要剔去的常用语.xlsx',
+            'target_path': r'D:\sort\A.xlsx',
+            'output_path': r'D:\sort\A_cleaned.xlsx'
+        }
 
 
 def get_words_to_remove(source_path):
@@ -32,10 +53,18 @@ def clean_excel(target_path, output_path, words):
 
 
 def main():
-    # 文件路径配置
-    source_path = r'D:\sort\数据清洗需要剔去的常用语.xlsx'  # 包含需要移除的词
-    target_path = r'D:\sort\A.xlsx'  # 待处理的文件
-    output_path = r'D:\sort\A_cleaned.xlsx'  # 输出文件
+    # 从配置文件加载路径配置
+    config = load_config()
+    
+    source_path = config.get('source_path')
+    target_path = config.get('target_path')
+    output_path = config.get('output_path')
+    
+    print("当前配置：")
+    print(f"源文件路径: {source_path}")
+    print(f"目标文件路径: {target_path}")
+    print(f"输出文件路径: {output_path}")
+    print()
 
     try:
         print("开始处理...")
@@ -48,4 +77,5 @@ def main():
 
 
 if __name__ == "__main__":
+
     main()

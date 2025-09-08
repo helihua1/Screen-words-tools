@@ -2,20 +2,59 @@ import re
 
 import pandas as pd
 import os
+'''
+PRIORITY_FILE_PATH 表格格式 :疾病	栏目	素材类型	关键词
+SORTED_FILE_PATH 表格格式 :句子
+句子中包含PRIORITY_FILE_PATH表格中的关键词，则将句子保存到OUTPUT_FILE_PATH表格的后几列中。未匹配的句子保存到OUTPUT_FILE_PATH表格的第1列。
+OUTPUT_FILE_PATH 表格格式 :未匹配的句子	|关键词属性1	关键词属性2	关键词属性3	匹配到的关键词	匹配到的句子
+'''
+
+def read_config():
+    """读取配置文件中的路径设置"""
+    config = {}
+    try:
+        with open('config.txt', 'r', encoding='utf-8') as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith('#') and '=' in line:
+                    key, value = line.split('=', 1)
+                    config[key.strip()] = value.strip()
+        return config
+    except FileNotFoundError:
+        print("警告：未找到config.txt配置文件，使用默认路径")
+        return {
+            'SORTED_FILE_PATH': r"D:\sort\A.xlsx",
+            'PRIORITY_FILE_PATH': r"D:\sort\确定可以保存的词.xlsx",
+            'OUTPUT_FILE_PATH': r"D:\sort\sort_save_InsertType.xlsx"
+        }
 
 
 def process_excel_files():
+    # 从配置文件读取路径设置
+    config = read_config()
+    
     # 文件路径设置
-    sorted_file_path = r"D:\sort\A.xlsx"
-    priority_file_path = r"D:\sort\确定可以保存的词.xlsx"
-    output_file_path = r"D:\sort\sort_save_InsertType.xlsx"
+    # 先去字典 config 里找键 SORTED_FILE_PATH 的值
+    # 如果找到了，就用配置文件里指定的路径
+    # 如果没找到（比如 config.txt 没写这个键），就用后面的默认值：r"D:\sort\A.xlsx"
+    sorted_file_path = config.get('SORTED_FILE_PATH', r"D:\sort\A.xlsx")
+    priority_file_path = config.get('PRIORITY_FILE_PATH', r"D:\sort\确定可以保存的词.xlsx")
+    output_file_path = config.get('OUTPUT_FILE_PATH', r"D:\sort\sort_save_InsertType.xlsx")
+
+    print(f"使用配置文件中的路径：")
+    print(f"排序文件：{sorted_file_path}")
+    print(f"优先词文件：{priority_file_path}")
+    print(f"输出文件：{output_file_path}")
+    print("-" * 50)
 
     try:
+        print("读取excel")
         # 读取sorted.xlsx中的句子（第1列）
         sorted_df = pd.read_excel(sorted_file_path, header=None, usecols=[0])
 
 
         sentences = sorted_df[0].tolist()  # 获取第1列所有句子
+
 
         # 读取优先聚合.xlsx中的词（第4列和第8列）及其前3列属性
         # 第4列（索引3）的前3列属性为索引0、1、2；第8列（索引7）的前3列属性为索引4、5、6
@@ -27,7 +66,7 @@ def process_excel_files():
         # 存储第8列关键词及其属性（前3列）
         priority2_words = []
         priority2_attrs = {}  # 键:关键词, 值:属性列表[attr4, attr5, attr6]
-
+        print("开始检索")
         # 提取关键词及其对应的属性
         for idx, row in priority_df.iterrows():
             # 处理第4列（索引3）的关键词及其属性
@@ -47,7 +86,6 @@ def process_excel_files():
         # 用于存储匹配到的句子及对应的关键词和属性
         matched_dict = {}  # 键:关键词, 值:该关键词匹配到的句子列表
         remaining_sentences = []
-
         # 遍历所有句子，检查是否包含优先聚合词并记录匹配的关键词
         for sentence in sentences:
             if pd.isna(sentence):  # 不对空值进行比对
@@ -55,9 +93,9 @@ def process_excel_files():
                 continue
 
             matched_word = None
-            # 先检查第4列优先级高的词
+            # # 先检查第4列优先级高的词
             for word in priority1_words:
-                if str(word) in str(sentence):
+                if str(word) in str(sentence):#忽略大小写
                     matched_word = word
                     break
 
@@ -101,7 +139,7 @@ def process_excel_files():
 
         # 准备构建结果DataFrame的数据
         max_length = max(len(aggregated_data), len(remaining_sentences))
-
+        print("开始制作excel")
         # 拆分聚合数据到各列
         agg_attr1 = [item[0] for item in aggregated_data] + [None] * (max_length - len(aggregated_data))
         agg_attr2 = [item[1] for item in aggregated_data] + [None] * (max_length - len(aggregated_data))
@@ -136,4 +174,6 @@ def process_excel_files():
 
 
 if __name__ == "__main__":
+    print("程序开始执行。。。")
     process_excel_files()
+    input("按回车键退出...")

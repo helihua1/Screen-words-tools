@@ -1,0 +1,46 @@
+#sorted_by_Frequency_AndWordNum配置文件
+# 词频统计相关路径和参数
+freq_input_path=D:\sort\A.xlsx
+freq_rate_multiplier=3
+freq_output_path=D:\sort\sorted_by_Frequency_AndWordNum
+
+-------------------------------------------------------------------------------------
+#clean配置文件
+# 数据清洗配置文件
+# 请根据实际情况修改以下路径
+
+# 包含需要移除的词的源文件路径
+clean_source_path=D:\sort\数据清洗需要剔去的常用语.xlsx
+
+# 待处理的文件路径
+clean_target_path=D:\sort\B.xlsx
+
+# 输出文件路径
+clean_output_path=D:\sort\A_cleaned.xlsx
+-------------------------------------------------------------------------------------
+#sort_save_InsertType_TwoAttributesTypeReplacement配置文件
+# Excel文件路径配置
+# 请根据实际情况修改以下路径
+
+# 排序后的句子文件路径
+SORTED_FILE_PATH=D:\sort\A.xlsx
+
+# 优先聚合词文件路径
+PRIORITY_FILE_PATH=D:\sort\确定可以保存的词.xlsx
+
+# 输出结果文件路径
+OUTPUT_FILE_PATH=D:\sort\sort_save_InsertType_TwoAttributesTypeReplacement.xlsx
+-------------------------------------------------------------------------------------
+#sort_save_InsertType配置文件
+# Excel文件路径配置
+# 请根据实际情况修改以下路径
+
+# 排序后的句子文件路径
+SORTED_FILE_PATH=D:\sort\A.xlsx
+
+# 优先聚合词文件路径
+PRIORITY_FILE_PATH=D:\sort\确定可以保存的词.xlsx
+
+# 输出结果文件路径
+OUTPUT_FILE_PATH=D:\sort\sort_save_InsertType.xlsx
+

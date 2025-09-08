@@ -4,8 +4,19 @@ from pypinyin import lazy_pinyin
 from functools import lru_cache
 from joblib import Parallel, delayed
 import jieba
-from utils import chinese_segment, get_pinyin
 
+'''
+此功能用rag语义匹配替代，暂时不用
+'''
+
+def chinese_segment(text):
+    # 输入："宁波鄞州博润皮肤病医院" 输出：['宁波', '鄞州', '博润', '皮肤', '医院']
+    # return [w for w in jieba.lcut_for_search(text) if len(w) >= 2]
+    return [w for w in jieba.lcut_for_search(text) ]
+
+
+def get_pinyin(text):
+    return ' '.join(lazy_pinyin(text))#输入： 宁波医院 输出：ningboyiyuan
 
 def fast_filter(user_input, keywords):
     words = chinese_segment(user_input)
